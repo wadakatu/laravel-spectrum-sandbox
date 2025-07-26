@@ -1,0 +1,16 @@
+{
+  "name": "laravel-spectrum-sandbox",
+  "version": "0.1.0",
+  "description": "Interactive sandbox for Laravel Spectrum",
+  "scripts": {
+    "serve": "npx http-server public -p 8085 -o",
+    "serve:live": "npx live-server public --port=8085"
+  },
+  "keywords": ["laravel", "spectrum", "sandbox", "api", "documentation"],
+  "author": "wadakatu",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2"
+  }
+}

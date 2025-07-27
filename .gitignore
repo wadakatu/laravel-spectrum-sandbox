@@ -4,4 +4,4 @@ docs
 *.swp
 *.swo
 *~
-.DS_Store
+.DS_Storenode_modules/

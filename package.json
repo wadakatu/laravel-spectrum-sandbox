@@ -1,10 +1,15 @@
 {
   "name": "laravel-spectrum-sandbox",
-  "version": "0.4.0",
-  "description": "Interactive sandbox for Laravel Spectrum with Swagger UI integration",
+  "version": "0.5.0",
+  "description": "Interactive sandbox for Laravel Spectrum with real command execution",
   "scripts": {
     "serve": "npx http-server public -p 8085 -o",
-    "serve:live": "npx live-server public --port=8085"
+    "serve:live": "npx live-server public --port=8085",
+    "api:install": "cd api && composer install",
+    "api:serve": "cd api && php artisan serve",
+    "docker:build": "cd docker && ./build-all.sh",
+    "dev": "concurrently \"npm run api:serve\" \"npm run serve\"",
+    "test:e2e": "playwright test"
   },
   "keywords": [
     "laravel",
@@ -18,6 +23,7 @@
   "devDependencies": {
     "http-server": "^14.1.1",
     "live-server": "^1.2.2",
-    "playwright": "^1.54.1"
+    "@playwright/test": "^1.54.1",
+    "concurrently": "^8.2.0"
   }
 }

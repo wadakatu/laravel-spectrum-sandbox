@@ -165,6 +165,9 @@ class UserResource extends JsonResource
 // Store original code for reset functionality
 const originalFiles = JSON.parse(JSON.stringify(sampleFiles));
 
+// Export sampleFiles to global scope for access from app.js
+window.sampleFiles = sampleFiles;
+
 // Initialize Monaco Editor
 let editor;
 let currentFile = 'routes/api.php';
@@ -186,9 +189,18 @@ require(['vs/editor/editor.main'], function() {
         wordWrap: 'on'
     });
 
-    // Track changes
+    // Track changes and emit events
     editor.onDidChangeModelContent(() => {
-        sampleFiles[currentFile] = editor.getValue();
+        const newContent = editor.getValue();
+        sampleFiles[currentFile] = newContent;
+        
+        // Emit custom event for code changes
+        window.dispatchEvent(new CustomEvent('codeChanged', {
+            detail: {
+                file: currentFile,
+                content: newContent
+            }
+        }));
     });
 });
 
@@ -206,6 +218,14 @@ document.querySelectorAll('.file-item').forEach(item => {
         
         if (editor) {
             editor.setValue(sampleFiles[fileName] || '// File not found');
+            
+            // Emit event for file switch
+            window.dispatchEvent(new CustomEvent('codeChanged', {
+                detail: {
+                    file: fileName,
+                    content: sampleFiles[fileName]
+                }
+            }));
         }
     });
 });

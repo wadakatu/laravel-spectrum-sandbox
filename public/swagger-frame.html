@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swagger UI</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.0/swagger-ui.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #swagger-ui .topbar {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.0/swagger-ui-bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.10.0/swagger-ui-standalone-preset.js"></script>
+    <script>
+        // Listen for spec data from parent
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'swagger-spec') {
+                const spec = event.data.spec;
+                
+                window.ui = SwaggerUIBundle({
+                    spec: spec,
+                    dom_id: '#swagger-ui',
+                    presets: [
+                        SwaggerUIBundle.presets.apis,
+                        SwaggerUIStandalonePreset
+                    ],
+                    layout: 'BaseLayout',
+                    tryItOutEnabled: false,
+                    supportedSubmitMethods: []
+                });
+            }
+        });
+        
+        // Signal that iframe is ready
+        window.parent.postMessage({ type: 'swagger-ready' }, '*');
+    </script>
+</body>
+</html>

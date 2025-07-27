@@ -106,7 +106,8 @@ function executeCommand(command) {
 // Enhanced documentation preview
 function showDocumentationPreview() {
     const docPreview = document.getElementById('documentation-preview');
-    const openApiOutput = document.getElementById('openapi-output');
+    const swaggerFrame = document.getElementById('swagger-frame');
+    const loadingDiv = document.getElementById('swagger-loading');
     
     // Generate OpenAPI based on analyzed code
     const openApiSpec = analyzer.generateOpenApiPreview(
@@ -114,12 +115,29 @@ function showDocumentationPreview() {
         currentAnalysis.validationRules
     );
     
-    openApiOutput.textContent = JSON.stringify(openApiSpec, null, 2);
+    // Show the documentation preview section
     docPreview.style.display = 'block';
     
-    // Add syntax highlighting if Prism is available
-    if (typeof Prism !== 'undefined') {
-        Prism.highlightElement(openApiOutput);
+    // Send spec to iframe
+    swaggerFrame.onload = function() {
+        setTimeout(function() {
+            swaggerFrame.contentWindow.postMessage({
+                type: 'swagger-spec',
+                spec: openApiSpec
+            }, '*');
+            loadingDiv.style.display = 'none';
+            swaggerFrame.style.display = 'block';
+        }, 100);
+    };
+    
+    // If iframe is already loaded, send message immediately
+    if (swaggerFrame.contentDocument && swaggerFrame.contentDocument.readyState === 'complete') {
+        swaggerFrame.contentWindow.postMessage({
+            type: 'swagger-spec',
+            spec: openApiSpec
+        }, '*');
+        loadingDiv.style.display = 'none';
+        swaggerFrame.style.display = 'block';
     }
     
     // Scroll to preview

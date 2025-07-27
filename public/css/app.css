@@ -104,6 +104,15 @@ body {
     .col-md-4 { flex: 0 0 35%; }
 }
 
+/* Swagger UI customization */
+#swagger-ui {
+    min-height: 400px;
+}
+
+#swagger-ui .topbar {
+    display: none;
+}
+
 /* スクロールバー */
 .terminal-output::-webkit-scrollbar,
 #editor::-webkit-scrollbar {

@@ -1,7 +1,7 @@
 {
   "name": "laravel-spectrum-sandbox",
-  "version": "0.1.0",
-  "description": "Interactive sandbox for Laravel Spectrum",
+  "version": "0.3.0",
+  "description": "Interactive sandbox for Laravel Spectrum with dynamic code analysis",
   "scripts": {
     "serve": "npx http-server public -p 8085 -o",
     "serve:live": "npx live-server public --port=8085"

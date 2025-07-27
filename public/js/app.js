@@ -1,19 +1,45 @@
-// Command outputs mock data
-const commandOutputs = {
-    generate: [
+// Initialize code analyzer
+const analyzer = new CodeAnalyzer();
+
+// Store analyzed data
+let currentAnalysis = {
+    routes: [],
+    validationRules: {},
+    resourceFields: []
+};
+
+// Update command outputs based on analyzed code
+function updateCommandOutputs() {
+    const routesCode = window.sampleFiles['routes/api.php'] || '';
+    const routes = analyzer.analyzeRoutes(routesCode);
+    currentAnalysis.routes = routes;
+    
+    // Update route count in command outputs
+    const routeCount = routes.length;
+    const routeList = routes.map(r => `  ✓ ${r.method} ${r.uri}`);
+    
+    commandOutputs.generate = [
         { text: '$ php artisan spectrum:generate', class: 'command' },
         { text: '🚀 Generating API documentation...', class: 'info' },
         { text: '🔍 Analyzing routes...', class: 'info' },
-        { text: '📝 Found 4 API routes', class: 'success' },
+        { text: `📝 Found ${routeCount} API routes`, class: 'success' },
         { text: '🔄 Processing endpoints...', class: 'info' },
-        { text: '  ✓ GET /api/users', class: 'success' },
-        { text: '  ✓ POST /api/users', class: 'success' },
-        { text: '  ✓ GET /api/users/{id}', class: 'success' },
-        { text: '  ✓ PUT /api/users/{id}', class: 'success' },
+        ...routeList.map(r => ({ text: r, class: 'success' })),
         { text: '✅ Documentation generated successfully!', class: 'success' },
         { text: '📁 Output: storage/app/spectrum/openapi.json', class: 'info' },
-        { text: '⏱️  Generation time: 0.42 seconds', class: 'info' }
-    ],
+        { text: `⏱️  Generation time: ${(0.3 + routeCount * 0.05).toFixed(2)} seconds`, class: 'info' }
+    ];
+    
+    // Analyze validation rules if StoreUserRequest is being viewed
+    const requestCode = window.sampleFiles['app/Http/Requests/StoreUserRequest.php'] || '';
+    if (requestCode) {
+        currentAnalysis.validationRules = analyzer.analyzeValidationRules(requestCode);
+    }
+}
+
+// Existing command outputs...
+const commandOutputs = {
+    generate: [],
     watch: [
         { text: '$ php artisan spectrum:watch', class: 'command' },
         { text: '🚀 Starting Laravel Spectrum preview server...', class: 'info' },
@@ -27,12 +53,13 @@ const commandOutputs = {
         { text: '$ php artisan spectrum:mock', class: 'command' },
         { text: '🚀 Starting Laravel Spectrum Mock Server...', class: 'info' },
         { text: '📄 Loading OpenAPI specification...', class: 'info' },
-        { text: '✅ Loaded 4 endpoints', class: 'success' },
+        { text: '✅ Loaded 5 endpoints', class: 'success' },
         { text: '', class: '' },
         { text: '🎭 Mock Server Configuration:', class: 'info' },
         { text: '  Host: 127.0.0.1', class: 'info' },
         { text: '  Port: 8081', class: 'info' },
-        { text: '  Endpoints: 4', class: 'info' },
+        { text: '  Endpoints: 5', class: 'info' },
+        { text: '  Response delay: 0ms', class: 'info' },
         { text: '', class: '' },
         { text: '✅ Mock server is running at http://127.0.0.1:8081', class: 'success' },
         { text: 'Press Ctrl+C to stop', class: 'info' }
@@ -51,8 +78,11 @@ function addTerminalLine(text, className = '') {
     terminal.scrollTop = terminal.scrollHeight;
 }
 
-// Simulate command execution
+// Original executeCommand function with modifications
 function executeCommand(command) {
+    // Update analysis before executing
+    updateCommandOutputs();
+    
     const outputs = commandOutputs[command] || [];
     
     // Clear previous output
@@ -62,12 +92,56 @@ function executeCommand(command) {
     outputs.forEach((output, index) => {
         setTimeout(() => {
             addTerminalLine(output.text, output.class);
+            
+            // Show documentation preview after generate command
+            if (command === 'generate' && index === outputs.length - 1) {
+                setTimeout(() => {
+                    showDocumentationPreview();
+                }, 500);
+            }
         }, index * 100);
     });
 }
 
+// Enhanced documentation preview
+function showDocumentationPreview() {
+    const docPreview = document.getElementById('documentation-preview');
+    const openApiOutput = document.getElementById('openapi-output');
+    
+    // Generate OpenAPI based on analyzed code
+    const openApiSpec = analyzer.generateOpenApiPreview(
+        currentAnalysis.routes,
+        currentAnalysis.validationRules
+    );
+    
+    openApiOutput.textContent = JSON.stringify(openApiSpec, null, 2);
+    docPreview.style.display = 'block';
+    
+    // Add syntax highlighting if Prism is available
+    if (typeof Prism !== 'undefined') {
+        Prism.highlightElement(openApiOutput);
+    }
+    
+    // Scroll to preview
+    docPreview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Listen for code changes (called from editor.js)
+window.addEventListener('codeChanged', (event) => {
+    const { file, content } = event.detail;
+    window.sampleFiles[file] = content;
+    
+    // If routes file changed, update the analysis
+    if (file === 'routes/api.php') {
+        updateCommandOutputs();
+    }
+});
+
 // Event listeners
 document.addEventListener('DOMContentLoaded', () => {
+    // Initial analysis
+    updateCommandOutputs();
+    
     // Command buttons
     document.querySelectorAll('.command-btn').forEach(button => {
         button.addEventListener('click', (e) => {
@@ -79,5 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Clear terminal button
     document.getElementById('clear-terminal').addEventListener('click', () => {
         terminal.innerHTML = '<div class="terminal-line">$ <span class="text-info">Ready to execute commands...</span></div>';
+        document.getElementById('documentation-preview').style.display = 'none';
     });
 });

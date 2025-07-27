@@ -1,1 +1,7 @@
 docs
+
+# Editor temporary files
+*.swp
+*.swo
+*~
+.DS_Store

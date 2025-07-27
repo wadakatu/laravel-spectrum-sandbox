@@ -3,10 +3,10 @@ version: '3.8'
 services:
   api:
     build:
-      context: ./api
-      dockerfile: Dockerfile
+      context: ../
+      dockerfile: docker/api/Dockerfile
     ports:
-      - "8000:8000"
+      - "${API_PORT:-8000}:8000"
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
@@ -24,7 +24,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
 

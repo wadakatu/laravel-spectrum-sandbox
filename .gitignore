@@ -6,3 +6,5 @@ docker/.env
 *.swo
 *~
 .DS_Storenode_modules/
+
+node_modules

@@ -1,4 +1,5 @@
 docs
+docker/.env
 
 # Editor temporary files
 *.swp

@@ -1,12 +1,25 @@
-// API client for real backend
+// API client with mock mode support
 class SandboxAPIClient {
     constructor() {
         this.baseURL = 'http://localhost:8000/api/v1';
         this.sessionId = null;
         this.currentConfig = null;
+        this.useMockMode = true; // モックモードを有効化（Dockerなしでも動作）
     }
     
     async createSession(framework, frameworkVersion, spectrumVersion, phpVersion) {
+        // モックモードの場合は即座に成功を返す
+        if (this.useMockMode) {
+            this.sessionId = 'mock-' + Date.now();
+            this.currentConfig = { framework, frameworkVersion, spectrumVersion, phpVersion };
+            console.log('Mock mode: Session created', this.sessionId);
+            return {
+                session_id: this.sessionId,
+                status: 'ready',
+                expires_in: 3600
+            };
+        }
+        
         try {
             const response = await fetch(`${this.baseURL}/sandbox/create`, {
                 method: 'POST',
@@ -42,6 +55,12 @@ class SandboxAPIClient {
             throw new Error('No active session');
         }
         
+        // モックモードの場合は成功を返す
+        if (this.useMockMode) {
+            console.log('Mock mode: File updated', path);
+            return { success: true };
+        }
+        
         const response = await fetch(`${this.baseURL}/sandbox/${this.sessionId}/file`, {
             method: 'POST',
             headers: {
@@ -64,6 +83,27 @@ class SandboxAPIClient {
             throw new Error('No active session');
         }
         
+        // モックモードの場合はサンプル出力を返す
+        if (this.useMockMode) {
+            console.log('Mock mode: Executing command', command);
+            
+            // コマンドに応じたモック出力を返す
+            if (command === 'spectrum:generate') {
+                return window.generateMockOutput ? window.generateMockOutput() : {
+                    output: '🚀 Generating API documentation...\n✅ Documentation generated successfully!',
+                    error: null,
+                    exit_code: 0,
+                    openapi: window.sampleOpenAPI || null
+                };
+            }
+            
+            return {
+                output: `Mock execution of: ${command}`,
+                error: null,
+                exit_code: 0
+            };
+        }
+        
         const response = await fetch(`${this.baseURL}/sandbox/${this.sessionId}/execute`, {
             method: 'POST',
             headers: {
@@ -83,6 +123,14 @@ class SandboxAPIClient {
     
     async destroySession() {
         if (!this.sessionId) return;
+        
+        // モックモードの場合は即座にクリア
+        if (this.useMockMode) {
+            console.log('Mock mode: Session destroyed', this.sessionId);
+            this.sessionId = null;
+            this.currentConfig = null;
+            return;
+        }
         
         try {
             await fetch(`${this.baseURL}/sandbox/${this.sessionId}`, {

@@ -53,38 +53,54 @@
                     <div class="panel-body" id="command-palette">
                         <div class="command-group">
                             <div class="command-group-title">Generation</div>
-                            <button class="command-btn" onclick="runCommand('php artisan spectrum:generate')">
-                                spectrum:generate
+                            <button class="command-btn" onclick="runCommand('php artisan spectrum:generate', event)" title="Generate OpenAPI documentation in JSON format">
+                                <i class="bi bi-file-earmark-code"></i>
+                                <span class="command-name">spectrum:generate</span>
+                                <span class="command-desc">Generate OpenAPI (JSON)</span>
                             </button>
-                            <button class="command-btn" onclick="runCommand('php artisan spectrum:generate --format=yaml')">
-                                spectrum:generate --format=yaml
+                            <button class="command-btn" onclick="runCommand('php artisan spectrum:generate --format=yaml', event)" title="Generate OpenAPI documentation in YAML format">
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span class="command-name">spectrum:generate --format=yaml</span>
+                                <span class="command-desc">Generate OpenAPI (YAML)</span>
                             </button>
                         </div>
                         <div class="command-group">
                             <div class="command-group-title">Development</div>
-                            <button class="command-btn" onclick="runCommand('php artisan spectrum:watch')">
-                                spectrum:watch
+                            <button class="command-btn" onclick="runCommand('php artisan spectrum:watch', event)" title="Start live preview server with hot reload">
+                                <i class="bi bi-eye"></i>
+                                <span class="command-name">spectrum:watch</span>
+                                <span class="command-desc">Live preview server</span>
                             </button>
-                            <button class="command-btn" onclick="runCommand('php artisan spectrum:mock')">
-                                spectrum:mock
+                            <button class="command-btn" onclick="runCommand('php artisan spectrum:mock', event)" title="Start mock API server based on OpenAPI spec">
+                                <i class="bi bi-server"></i>
+                                <span class="command-name">spectrum:mock</span>
+                                <span class="command-desc">Mock API server</span>
                             </button>
                         </div>
                         <div class="command-group">
                             <div class="command-group-title">Export</div>
-                            <button class="command-btn" onclick="runCommand('php artisan spectrum:export:postman')">
-                                export:postman
+                            <button class="command-btn" onclick="runCommand('php artisan spectrum:export:postman', event)" title="Export API documentation as Postman collection">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                                <span class="command-name">export:postman</span>
+                                <span class="command-desc">Export to Postman</span>
                             </button>
-                            <button class="command-btn" onclick="runCommand('php artisan spectrum:export:insomnia')">
-                                export:insomnia
+                            <button class="command-btn" onclick="runCommand('php artisan spectrum:export:insomnia', event)" title="Export API documentation as Insomnia collection">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                                <span class="command-name">export:insomnia</span>
+                                <span class="command-desc">Export to Insomnia</span>
                             </button>
                         </div>
                         <div class="command-group">
                             <div class="command-group-title">Cache</div>
-                            <button class="command-btn" onclick="runCommand('php artisan spectrum:cache:clear')">
-                                cache:clear
+                            <button class="command-btn" onclick="runCommand('php artisan spectrum:cache:clear', event)" title="Clear all Spectrum cache">
+                                <i class="bi bi-trash3"></i>
+                                <span class="command-name">cache:clear</span>
+                                <span class="command-desc">Clear cache</span>
                             </button>
-                            <button class="command-btn" onclick="runCommand('php artisan spectrum:cache:stats')">
-                                cache:stats
+                            <button class="command-btn" onclick="runCommand('php artisan spectrum:cache:stats', event)" title="Show cache statistics">
+                                <i class="bi bi-graph-up"></i>
+                                <span class="command-name">cache:stats</span>
+                                <span class="command-desc">Cache statistics</span>
                             </button>
                         </div>
                     </div>

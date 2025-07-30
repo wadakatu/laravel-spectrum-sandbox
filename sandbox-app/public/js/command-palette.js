@@ -1,9 +1,35 @@
 // Command Palette functionality
-window.runCommand = function(command) {
+window.runCommand = function(command, buttonElement) {
     if (window.terminalManager) {
-        window.terminalManager.runCommand(command);
+        // Add visual feedback
+        if (buttonElement && buttonElement.target) {
+            const btn = buttonElement.target.closest('.command-btn');
+            if (btn) {
+                // Add running state
+                btn.classList.add('command-running');
+                
+                // Show running indicator
+                const originalContent = btn.innerHTML;
+                const icon = btn.querySelector('i');
+                if (icon) {
+                    icon.className = 'bi bi-hourglass-split spin';
+                }
+                
+                // Run the command
+                window.terminalManager.runCommand(command);
+                
+                // Remove running state after a delay
+                setTimeout(() => {
+                    btn.classList.remove('command-running');
+                    btn.innerHTML = originalContent;
+                }, 2000);
+            }
+        } else {
+            // Fallback if no button element
+            window.terminalManager.runCommand(command);
+        }
     }
-};
+};;
 
 window.clearTerminal = function() {
     if (window.terminalManager) {

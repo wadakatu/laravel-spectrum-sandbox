@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Install Node dependencies for terminal server
-RUN npm install -g node-pty ws
+WORKDIR /usr/local/bin
+RUN npm init -y && npm install node-pty ws
 
 # Create Laravel project
 ARG LARAVEL_VERSION="^10.0"

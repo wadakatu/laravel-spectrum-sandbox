@@ -17,6 +17,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/sites:/etc/nginx/sites-enabled:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - sandbox-app
       - laravel-10
@@ -41,6 +42,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./sandbox-app:/app
+    ports:
+      - "3001:3001"
+      - "3000:3000"
     networks:
       - sandbox-network
 

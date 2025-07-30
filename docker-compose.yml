@@ -1,0 +1,151 @@
+x-sandbox-common: &sandbox-common
+  networks:
+    - sandbox-network
+  volumes:
+    - ./shared:/shared:ro
+  environment:
+    - SANDBOX_MODE=true
+    - SPECTRUM_VERSION=${SPECTRUM_VERSION:-v0.1.0-beta}
+
+services:
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: spectrum-sandbox-proxy
+    ports:
+      - "8088:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites:/etc/nginx/sites-enabled:ro
+    depends_on:
+      - sandbox-app
+      - laravel-10
+      - laravel-11
+      - laravel-12
+      - lumen-10
+      - lumen-11
+      - lumen-12
+    networks:
+      - sandbox-network
+
+  # Main Sandbox Application
+  sandbox-app:
+    build:
+      context: ./sandbox-app
+      dockerfile: Dockerfile
+    container_name: spectrum-sandbox-app
+    environment:
+      - NODE_ENV=production
+      - WS_PORT=3000
+      - API_PORT=3001
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./sandbox-app:/app
+    networks:
+      - sandbox-network
+
+  # Laravel 10 Sandbox
+  laravel-10:
+    build:
+      context: ./environments/laravel-10
+      dockerfile: Dockerfile
+      args:
+        - PHP_VERSION=8.1
+        - LARAVEL_VERSION=^10.0
+        - SPECTRUM_VERSION=${SPECTRUM_VERSION:-v0.1.0-beta}
+    container_name: spectrum-sandbox-laravel-10
+    <<: *sandbox-common
+    environment:
+      - SANDBOX_VERSION=laravel-10
+      - TERMINAL_PORT=7010
+    ports:
+      - "7010:7010"
+
+  # Laravel 11 Sandbox
+  laravel-11:
+    build:
+      context: ./environments/laravel-11
+      dockerfile: Dockerfile
+      args:
+        - PHP_VERSION=8.2
+        - LARAVEL_VERSION=^11.0
+        - SPECTRUM_VERSION=${SPECTRUM_VERSION:-v0.1.0-beta}
+    container_name: spectrum-sandbox-laravel-11
+    <<: *sandbox-common
+    environment:
+      - SANDBOX_VERSION=laravel-11
+      - TERMINAL_PORT=7011
+    ports:
+      - "7011:7011"
+
+  # Laravel 12 Sandbox
+  laravel-12:
+    build:
+      context: ./environments/laravel-12
+      dockerfile: Dockerfile
+      args:
+        - PHP_VERSION=8.2
+        - LARAVEL_VERSION=^12.0
+        - SPECTRUM_VERSION=${SPECTRUM_VERSION:-v0.1.0-beta}
+    container_name: spectrum-sandbox-laravel-12
+    <<: *sandbox-common
+    environment:
+      - SANDBOX_VERSION=laravel-12
+      - TERMINAL_PORT=7012
+    ports:
+      - "7012:7012"
+
+  # Lumen 10 Sandbox
+  lumen-10:
+    build:
+      context: ./environments/lumen-10
+      dockerfile: Dockerfile
+      args:
+        - PHP_VERSION=8.1
+        - LUMEN_VERSION=^10.0
+        - SPECTRUM_VERSION=${SPECTRUM_VERSION:-v0.1.0-beta}
+    container_name: spectrum-sandbox-lumen-10
+    <<: *sandbox-common
+    environment:
+      - SANDBOX_VERSION=lumen-10
+      - TERMINAL_PORT=7110
+    ports:
+      - "7110:7110"
+
+  # Lumen 11 Sandbox
+  lumen-11:
+    build:
+      context: ./environments/lumen-11
+      dockerfile: Dockerfile
+      args:
+        - PHP_VERSION=8.2
+        - LUMEN_VERSION=^11.0
+        - SPECTRUM_VERSION=${SPECTRUM_VERSION:-v0.1.0-beta}
+    container_name: spectrum-sandbox-lumen-11
+    <<: *sandbox-common
+    environment:
+      - SANDBOX_VERSION=lumen-11
+      - TERMINAL_PORT=7111
+    ports:
+      - "7111:7111"
+
+  # Lumen 12 Sandbox
+  lumen-12:
+    build:
+      context: ./environments/lumen-12
+      dockerfile: Dockerfile
+      args:
+        - PHP_VERSION=8.2
+        - LUMEN_VERSION=^12.0
+        - SPECTRUM_VERSION=${SPECTRUM_VERSION:-v0.1.0-beta}
+    container_name: spectrum-sandbox-lumen-12
+    <<: *sandbox-common
+    environment:
+      - SANDBOX_VERSION=lumen-12
+      - TERMINAL_PORT=7112
+    ports:
+      - "7112:7112"
+
+networks:
+  sandbox-network:
+    driver: bridge

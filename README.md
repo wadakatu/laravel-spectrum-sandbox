@@ -1,40 +1,95 @@
-# Laravel Spectrum Sandbox
+# Laravel Spectrum Interactive Sandbox
 
-Interactive sandbox for testing [Laravel Spectrum](https://github.com/wadakatu/laravel-spectrum) commands.
+An interactive web-based sandbox environment for testing [Laravel Spectrum](https://github.com/wadakatu/laravel-spectrum) across multiple Laravel and Lumen versions.
 
 ## Features
 
-- ✅ Live code editing with Monaco Editor
-- ✅ Dynamic command output based on your code
-- ✅ Real-time route analysis
-- ✅ Validation rule detection
-- 🚧 API Resource field analysis (coming soon)
-- 🚧 Authentication detection (coming soon)
+- 🚀 **Multiple Environments**: Test on Laravel 10, 11, 12 and Lumen 10, 11, 12
+- 🖥️ **Web Terminal**: Full xterm.js terminal with WebSocket communication
+- 📁 **File Explorer**: Browse generated files and outputs
+- 🎯 **Command Palette**: Quick access to common Spectrum commands
+- 💾 **Download Results**: Export generated OpenAPI/Postman files
+- 🔄 **Live Updates**: Real-time file system monitoring
 
-## Current Version: v0.3.0
+## Quick Start
 
-### What's New
-- Dynamic code analysis
-- Routes are detected from your code
-- Command outputs update based on your changes
-- OpenAPI preview shows your actual routes
+1. Clone the repository:
+```bash
+git clone https://github.com/yourname/laravel-spectrum-sandbox
+cd laravel-spectrum-sandbox
+```
+
+2. Copy environment file:
+```bash
+cp .env.example .env
+```
+
+3. Build and start the containers:
+```bash
+make up
+```
+
+4. Access the sandbox at http://localhost:8088
 
 ## Usage
 
-1. Edit the sample files in the editor
-2. Click any command button to see the output
-3. The generated documentation reflects your code changes
+1. Select your desired Laravel/Lumen version from the home page
+2. Use the terminal to run Laravel Spectrum commands
+3. Use the command palette for quick command execution
+4. Browse generated files in the file explorer
+5. View output files in the output viewer
+6. Download generated files using the download button
 
-Try:
-- Adding new routes in `routes/api.php`
-- Modifying validation rules in `StoreUserRequest.php`
-- Changing the controller methods
+## Available Commands
+
+- `php artisan spectrum:generate` - Generate OpenAPI documentation
+- `php artisan spectrum:watch` - Start the preview server
+- `php artisan spectrum:mock` - Start the mock server
+- `php artisan spectrum:export:postman` - Export to Postman
+- `php artisan spectrum:export:insomnia` - Export to Insomnia
+- `php artisan spectrum:cache:clear` - Clear the cache
+
+## Architecture
+
+- **Nginx**: Reverse proxy routing requests to appropriate containers
+- **Node.js App**: Main application serving the UI and handling WebSocket connections
+- **Environment Containers**: Separate containers for each Laravel/Lumen version
+- **Terminal Server**: WebSocket-based terminal server in each environment
 
 ## Development
 
+### Building specific environments:
 ```bash
-npm install
-npm run serve
+make rebuild-laravel-11
 ```
 
-Visit http://localhost:8085
+### Viewing logs:
+```bash
+make logs-laravel-11
+```
+
+### Shell access:
+```bash
+make shell-laravel-11
+```
+
+## Troubleshooting
+
+### Container won't start
+- Check port availability: 8088, 7010-7012, 7110-7112
+- Ensure Docker daemon is running
+- Check logs: `make logs`
+
+### Terminal not connecting
+- Check WebSocket connection in browser console
+- Verify Nginx proxy configuration
+- Check terminal server logs: `make logs-laravel-11`
+
+### Files not updating
+- Ensure file watchers are working in containers
+- Check permissions on mounted volumes
+- Restart the specific container: `make restart-laravel-11`
+
+## License
+
+MIT License

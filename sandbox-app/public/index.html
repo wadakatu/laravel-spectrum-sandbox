@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laravel Spectrum Sandbox</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="bi bi-terminal"></i>
+                Laravel Spectrum Sandbox
+            </span>
+            <span class="navbar-text">
+                Interactive Testing Environment
+            </span>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4">Choose Your Environment</h2>
+                <div class="row g-4">
+                    <!-- Laravel Versions -->
+                    <div class="col-md-4">
+                        <div class="card environment-card" onclick="openSandbox('laravel', '10')">
+                            <div class="card-body text-center">
+                                <i class="bi bi-box-seam environment-icon text-danger"></i>
+                                <h5 class="card-title">Laravel 10</h5>
+                                <p class="card-text">PHP 8.1+ | Long Term Support</p>
+                                <button class="btn btn-primary">
+                                    <i class="bi bi-terminal"></i> Open Terminal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card environment-card" onclick="openSandbox('laravel', '11')">
+                            <div class="card-body text-center">
+                                <i class="bi bi-box-seam environment-icon text-danger"></i>
+                                <h5 class="card-title">Laravel 11</h5>
+                                <p class="card-text">PHP 8.2+ | Current Release</p>
+                                <button class="btn btn-primary">
+                                    <i class="bi bi-terminal"></i> Open Terminal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card environment-card" onclick="openSandbox('laravel', '12')">
+                            <div class="card-body text-center">
+                                <i class="bi bi-box-seam environment-icon text-danger"></i>
+                                <h5 class="card-title">Laravel 12</h5>
+                                <p class="card-text">PHP 8.2+ | Latest Version</p>
+                                <button class="btn btn-primary">
+                                    <i class="bi bi-terminal"></i> Open Terminal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lumen Versions -->
+                    <div class="col-md-4">
+                        <div class="card environment-card" onclick="openSandbox('lumen', '10')">
+                            <div class="card-body text-center">
+                                <i class="bi bi-lightning environment-icon text-warning"></i>
+                                <h5 class="card-title">Lumen 10</h5>
+                                <p class="card-text">PHP 8.1+ | Micro-framework</p>
+                                <button class="btn btn-warning text-dark">
+                                    <i class="bi bi-terminal"></i> Open Terminal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card environment-card" onclick="openSandbox('lumen', '11')">
+                            <div class="card-body text-center">
+                                <i class="bi bi-lightning environment-icon text-warning"></i>
+                                <h5 class="card-title">Lumen 11</h5>
+                                <p class="card-text">PHP 8.2+ | Micro-framework</p>
+                                <button class="btn btn-warning text-dark">
+                                    <i class="bi bi-terminal"></i> Open Terminal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card environment-card" onclick="openSandbox('lumen', '12')">
+                            <div class="card-body text-center">
+                                <i class="bi bi-lightning environment-icon text-warning"></i>
+                                <h5 class="card-title">Lumen 12</h5>
+                                <p class="card-text">PHP 8.2+ | Micro-framework</p>
+                                <button class="btn btn-warning text-dark">
+                                    <i class="bi bi-terminal"></i> Open Terminal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3>Quick Commands</h3>
+                <div class="quick-commands">
+                    <code>php artisan spectrum:generate</code>
+                    <code>php artisan spectrum:watch</code>
+                    <code>php artisan spectrum:mock</code>
+                    <code>php artisan spectrum:export:postman</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openSandbox(framework, version) {
+            window.location.href = `/${framework}/${version}`;
+        }
+    </script>
+</body>
+</html>

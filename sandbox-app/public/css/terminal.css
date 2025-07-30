@@ -1,0 +1,219 @@
+/* Terminal Styles */
+.sandbox-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #1e1e1e;
+}
+
+.sandbox-header {
+    background-color: #2d2d30;
+    color: #cccccc;
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #3e3e42;
+}
+
+.header-left,
+.header-center,
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.environment-badge {
+    background-color: #007acc;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    font-weight: bold;
+    margin-left: 1rem;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.connection-status.connected i {
+    color: #4ec9b0;
+}
+
+.connection-status.disconnected i {
+    color: #f44747;
+}
+
+.sandbox-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 300px;
+    background-color: #252526;
+    border-right: 1px solid #3e3e42;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.panel {
+    border-bottom: 1px solid #3e3e42;
+}
+
+.panel-header {
+    padding: 0.75rem 1rem;
+    background-color: #2d2d30;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.panel-header h6 {
+    margin: 0;
+    color: #cccccc;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.panel-body {
+    padding: 1rem;
+}
+
+.command-group {
+    margin-bottom: 1rem;
+}
+
+.command-group:last-child {
+    margin-bottom: 0;
+}
+
+.command-group-title {
+    font-size: 0.75rem;
+    color: #858585;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.command-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.25rem;
+    background-color: #3e3e42;
+    color: #cccccc;
+    border: none;
+    border-radius: 0.25rem;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.875rem;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.command-btn:hover {
+    background-color: #094771;
+    color: white;
+}
+
+.file-tree {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.875rem;
+    color: #cccccc;
+}
+
+.file-tree-item {
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    user-select: none;
+}
+
+.file-tree-item:hover {
+    background-color: #2a2d2e;
+}
+
+.file-tree-item.selected {
+    background-color: #094771;
+}
+
+.file-tree-item i {
+    font-size: 1rem;
+}
+
+.file-tree-directory > .file-tree-item {
+    font-weight: 500;
+}
+
+.file-tree-children {
+    margin-left: 1rem;
+}
+
+.output-viewer {
+    background-color: #1e1e1e;
+    border: 1px solid #3e3e42;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.75rem;
+    color: #cccccc;
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+
+.terminal-container {
+    flex: 1;
+    background-color: #1e1e1e;
+    padding: 1rem;
+}
+
+#terminal {
+    height: 100%;
+}
+
+/* Custom scrollbar */
+.sidebar::-webkit-scrollbar,
+.output-viewer::-webkit-scrollbar {
+    width: 10px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.output-viewer::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.output-viewer::-webkit-scrollbar-thumb {
+    background: #424242;
+    border-radius: 5px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover,
+.output-viewer::-webkit-scrollbar-thumb:hover {
+    background: #4a4a4a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+    
+    .sandbox-content {
+        flex-direction: column;
+    }
+    
+    .header-center .btn-group {
+        flex-wrap: wrap;
+    }
+}

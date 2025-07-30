@@ -1,0 +1,21 @@
+services:
+  # Main Sandbox Application
+  sandbox-app:
+    build:
+      context: ./sandbox-app
+      dockerfile: Dockerfile
+    container_name: spectrum-sandbox-app
+    ports:
+      - "8088:3001"
+    environment:
+      - NODE_ENV=production
+      - WS_PORT=3000
+      - API_PORT=3001
+    volumes:
+      - ./sandbox-app:/app
+    networks:
+      - sandbox-network
+
+networks:
+  sandbox-network:
+    driver: bridge

@@ -1,0 +1,23 @@
+FROM node:18-alpine
+
+# Install required packages
+RUN apk add --no-cache \
+    bash \
+    git \
+    openssh \
+    python3 \
+    make \
+    g++
+
+# Install node-pty dependencies
+RUN npm install -g node-pty ws
+
+# Copy terminal server
+COPY terminal-server.js /usr/local/bin/terminal-server
+RUN chmod +x /usr/local/bin/terminal-server
+
+# Create working directory
+WORKDIR /app
+
+# Default command
+CMD ["node", "/usr/local/bin/terminal-server"]

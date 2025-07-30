@@ -83,6 +83,20 @@
     gap: 0.5rem;
 }
 
+.panel-header .btn-link {
+    color: #007acc;
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    margin-left: auto;
+}
+
+.panel-header .btn-link:hover {
+    color: #0098ff;
+    background-color: rgba(0, 122, 204, 0.1);
+    border-radius: 4px;
+}
+
 .panel-body {
     padding: 1rem;
 }

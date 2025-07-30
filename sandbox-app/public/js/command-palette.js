@@ -91,10 +91,19 @@ window.refreshFileTree = function() {
 window.loadOutput = async function() {
     const selector = document.getElementById('output-selector');
     const viewer = document.getElementById('output-viewer');
+    const previewBtn = document.getElementById('swagger-preview-btn');
     
     if (!selector.value) {
         viewer.textContent = '';
+        previewBtn.style.display = 'none';
         return;
+    }
+    
+    // Show preview button only for OpenAPI files
+    if (selector.value === 'openapi.json' || selector.value === 'openapi.yaml') {
+        previewBtn.style.display = 'inline-flex';
+    } else {
+        previewBtn.style.display = 'none';
     }
     
     try {
@@ -107,4 +116,27 @@ window.loadOutput = async function() {
         console.error('Failed to load output:', error);
         viewer.textContent = 'Failed to load output file';
     }
+};
+
+window.previewInSwagger = function() {
+    const selector = document.getElementById('output-selector');
+    
+    if (!selector.value || !window.terminalManager || !window.terminalManager.sessionId) {
+        alert('Please select an OpenAPI file first');
+        return;
+    }
+    
+    // Open Swagger UI in a new window
+    const width = 1200;
+    const height = 800;
+    const left = (window.screen.width - width) / 2;
+    const top = (window.screen.height - height) / 2;
+    
+    const url = `/swagger-preview.html?session=${window.terminalManager.sessionId}&file=${selector.value}`;
+    
+    window.open(
+        url,
+        'swagger-preview',
+        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+    );
 };

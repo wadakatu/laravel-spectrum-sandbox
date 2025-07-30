@@ -6,6 +6,7 @@
     <title>Laravel Spectrum Sandbox - Terminal</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/terminal.css">
+    <link rel="stylesheet" href="/css/editor.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.1.0/css/xterm.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -41,7 +42,7 @@
         </div>
 
         <!-- Main Content -->
-        <div class="sandbox-content">
+        <div class="sandbox-content with-editor">
             <!-- Sidebar -->
             <div class="sidebar">
                 <!-- Command Palette -->
@@ -128,15 +129,49 @@
             <div class="terminal-container">
                 <div id="terminal"></div>
             </div>
+
+            <!-- Code Editor -->
+            <div class="editor-container">
+                <div class="editor-header">
+                    <div class="editor-tabs">
+                        <span id="editor-header">No file selected</span>
+                    </div>
+                    <div class="editor-actions">
+                        <div class="template-selector">
+                            <button class="editor-action-btn" onclick="toggleTemplateDropdown()">
+                                <i class="bi bi-file-code"></i> Templates
+                            </button>
+                            <div id="template-dropdown" class="template-dropdown">
+                                <div class="template-item" onclick="loadTemplate('basic-api')">
+                                    <div class="template-item-title">Basic API</div>
+                                    <div class="template-item-desc">Simple CRUD controller with validation</div>
+                                </div>
+                                <div class="template-item" onclick="loadTemplate('complex-validation')">
+                                    <div class="template-item-title">Complex Validation</div>
+                                    <div class="template-item-desc">Advanced validation rules example</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="editor-action-btn" onclick="saveFile()">
+                            <i class="bi bi-save"></i> Save
+                        </button>
+                    </div>
+                </div>
+                <div id="code-editor"></div>
+            </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/xterm@5.1.0/lib/xterm.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.7.0/lib/xterm-addon-fit.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xterm-addon-web-links@0.8.0/lib/xterm-addon-web-links.js"></script>
+    
+    <!-- Monaco Editor -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
     <script src="/js/terminal.js"></script>
     <script src="/js/file-explorer.js"></script>
     <script src="/js/command-palette.js"></script>
+    <script src="/js/editor.js"></script>
     <script src="/js/app.js"></script>
 </body>
 </html>

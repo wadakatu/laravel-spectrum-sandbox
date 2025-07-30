@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         fileExplorer = new FileExplorer(terminalManager);
         window.fileExplorer = fileExplorer;
         
+        // Initialize code editor
+        const editor = new CodeEditor();
+        window.codeEditor = editor;
+        await editor.init(terminalManager.sessionId);
+        
         // Load initial file tree
         await fileExplorer.refresh();
         
@@ -38,3 +43,30 @@ document.addEventListener('visibilitychange', () => {
         }
     }
 });
+
+// Global functions for editor
+window.toggleTemplateDropdown = function() {
+    const dropdown = document.getElementById('template-dropdown');
+    dropdown.classList.toggle('show');
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function closeDropdown(e) {
+        if (!e.target.closest('.template-selector')) {
+            dropdown.classList.remove('show');
+            document.removeEventListener('click', closeDropdown);
+        }
+    });
+}
+
+window.loadTemplate = function(templateName) {
+    if (window.codeEditor) {
+        window.codeEditor.loadTemplate(templateName);
+        document.getElementById('template-dropdown').classList.remove('show');
+    }
+}
+
+window.saveFile = function() {
+    if (window.codeEditor) {
+        window.codeEditor.saveCurrentFile();
+    }
+}

@@ -4,6 +4,13 @@ class FileExplorer {
         this.terminalManager = terminalManager;
         this.container = document.getElementById('file-tree');
         this.selectedFile = null;
+        this.setupEventListeners();
+    }
+    setupEventListeners() {
+        // Listen for refresh events
+        window.addEventListener('refresh-file-tree', () => {
+            this.refresh();
+        });
     }
 
     async refresh() {
@@ -78,6 +85,70 @@ class FileExplorer {
         }
     }
 
+    renderNode(node, parent = null, level = 0) {
+        if (node.type === 'directory') {
+            const dir = document.createElement('div');
+            dir.className = 'file-tree-directory';
+            dir.setAttribute('data-name', node.name);
+            
+            const item = document.createElement('div');
+            item.className = 'file-tree-item';
+            item.style.paddingLeft = `${level * 20}px`;
+            item.innerHTML = `
+                <i class="bi bi-folder-fill text-warning"></i>
+                <span>${node.name}</span>
+            `;
+            
+            const children = document.createElement('div');
+            children.className = 'file-tree-children';
+            
+            let expanded = level === 0; // Expand root by default
+            
+            item.addEventListener('click', () => {
+                expanded = !expanded;
+                children.style.display = expanded ? 'block' : 'none';
+                item.querySelector('i').className = expanded 
+                    ? 'bi bi-folder-open-fill text-warning' 
+                    : 'bi bi-folder-fill text-warning';
+            });
+            
+            dir.appendChild(item);
+            dir.appendChild(children);
+            
+            if (node.children) {
+                node.children.forEach(child => {
+                    const childElement = this.renderNode(child, dir, level + 1);
+                    children.appendChild(childElement);
+                });
+            }
+            
+            if (expanded) {
+                item.querySelector('i').className = 'bi bi-folder-open-fill text-warning';
+            } else {
+                children.style.display = 'none';
+            }
+            
+            return dir;
+        } else {
+            const item = document.createElement('div');
+            item.className = 'file-tree-item file-tree-file';
+            item.style.paddingLeft = `${level * 20}px`;
+            item.setAttribute('data-name', node.name);
+            
+            const icon = this.getFileIcon(node.name);
+            item.innerHTML = `
+                <i class="bi ${icon.class}" style="color: ${icon.color}"></i>
+                <span>${node.name}</span>
+            `;
+            
+            item.addEventListener('click', () => {
+                this.selectFile(node, item);
+            });
+            
+            return item;
+        }
+    }
+
     getFileIcon(filename) {
         const ext = filename.split('.').pop().toLowerCase();
         const icons = {
@@ -107,15 +178,33 @@ class FileExplorer {
         element.classList.add('selected');
         this.selectedFile = element;
         
-        // Open file in terminal
-        const path = this.getFilePath(file);
-        this.terminalManager.runCommand(`cat ${path}`);
+        // Get full file path
+        const path = this.getFilePath(file, element);
+        
+        // Dispatch event for editor to load the file
+        window.dispatchEvent(new CustomEvent('file-selected', {
+            detail: { path: path, file: file }
+        }));
     }
 
-    getFilePath(file) {
-        // This is a simplified path construction
-        // In a real implementation, you'd track the full path
-        return `/app/${file.name}`;
+    getFilePath(file, element) {
+        // Build full path by traversing up the tree
+        const pathParts = [file.name];
+        let current = element.parentElement;
+        
+        while (current && current !== this.container) {
+            const dirItem = current.previousElementSibling;
+            if (dirItem && dirItem.classList.contains('file-tree-item')) {
+                const dirName = dirItem.querySelector('span').textContent;
+                if (dirName !== 'app') { // Skip root 'app' directory as it's implicit
+                    pathParts.unshift(dirName);
+                }
+            }
+            current = current.parentElement.parentElement;
+        }
+        
+        // Prepend 'app/' to the path
+        return 'app/' + pathParts.join('/');
     }
 }
 

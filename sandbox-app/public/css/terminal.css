@@ -240,6 +240,107 @@
     flex: 1;
     background-color: #1e1e1e;
     padding: 1rem;
+    position: relative;
+}
+
+/* Terminal Notifications */
+.terminal-notification {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: #2d2d30;
+    border-radius: 8px;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    max-width: 350px;
+}
+
+.terminal-notification.show {
+    transform: translateX(0);
+}
+
+.terminal-notification i {
+    font-size: 1.25rem;
+}
+
+.terminal-notification-success {
+    background-color: #0e5a0e;
+    border: 1px solid #2ea043;
+    color: #56d364;
+}
+
+.terminal-notification-success i {
+    color: #56d364;
+}
+
+.terminal-notification-error {
+    background-color: #5a0e0e;
+    border: 1px solid #f85149;
+    color: #ff8b87;
+}
+
+.terminal-notification-error i {
+    color: #f85149;
+}
+
+.terminal-notification-info {
+    background-color: #094771;
+    border: 1px solid #007acc;
+    color: #58a6ff;
+}
+
+.terminal-notification-info i {
+    color: #58a6ff;
+}
+
+.terminal-notification-running {
+    background-color: #094771;
+    border: 1px solid #007acc;
+    color: #58a6ff;
+}
+
+.terminal-notification-running i {
+    color: #58a6ff;
+}
+
+/* Progress bar */
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: #007acc;
+    width: 0%;
+    animation: progress 2s ease-in-out infinite;
+}
+
+@keyframes progress {
+    0% { width: 0%; }
+    50% { width: 70%; }
+    100% { width: 100%; }
+}
+
+/* Spin animation */
+i.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 #terminal {

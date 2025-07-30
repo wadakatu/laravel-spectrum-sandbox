@@ -115,6 +115,37 @@ class TerminalManager {
                 switch (message.type) {
                     case 'output':
                         this.terminal.write(message.data);
+                        
+                        // Detect command completion patterns
+                        if (this.lastCommand && message.data) {
+                            const output = message.data.toString();
+                            
+                            // Check for Spectrum command completion
+                            if (this.lastCommand.includes('spectrum:')) {
+                                if (output.includes('✅') || output.includes('successfully') || output.includes('completed')) {
+                                    // Remove running notification
+                                    if (this.currentNotification) {
+                                        this.currentNotification.classList.remove('show');
+                                        setTimeout(() => this.currentNotification.remove(), 300);
+                                        this.currentNotification = null;
+                                    }
+                                    
+                                    const duration = Date.now() - this.commandStartTime;
+                                    this.showNotification(`Command completed in ${(duration/1000).toFixed(1)}s`, 'success');
+                                    this.lastCommand = null;
+                                } else if (output.includes('❌') || output.includes('error') || output.includes('failed')) {
+                                    // Remove running notification
+                                    if (this.currentNotification) {
+                                        this.currentNotification.classList.remove('show');
+                                        setTimeout(() => this.currentNotification.remove(), 300);
+                                        this.currentNotification = null;
+                                    }
+                                    
+                                    this.showNotification('Command failed!', 'error');
+                                    this.lastCommand = null;
+                                }
+                            }
+                        }
                         break;
                     case 'clear':
                         this.terminal.clear();
@@ -122,6 +153,46 @@ class TerminalManager {
                     case 'file-update':
                         if (window.fileExplorer) {
                             window.fileExplorer.refresh();
+                        }
+                        
+                        // Auto-update output viewer and show notification
+                        if (this.lastCommand) {
+                            if (this.lastCommand.includes('spectrum:generate')) {
+                                // Remove running notification
+                                if (this.currentNotification) {
+                                    this.currentNotification.classList.remove('show');
+                                    setTimeout(() => this.currentNotification.remove(), 300);
+                                    this.currentNotification = null;
+                                }
+                                
+                                // Show success notification
+                                this.showNotification('OpenAPI documentation generated!', 'success', 4000);
+                                
+                                // Auto-select the generated file
+                                const selector = document.getElementById('output-selector');
+                                if (this.lastCommand.includes('--format=yaml')) {
+                                    selector.value = 'openapi.yaml';
+                                } else {
+                                    selector.value = 'openapi.json';
+                                }
+                                window.loadOutput();
+                                
+                            } else if (this.lastCommand.includes('spectrum:export')) {
+                                // Handle export commands
+                                if (this.currentNotification) {
+                                    this.currentNotification.classList.remove('show');
+                                    setTimeout(() => this.currentNotification.remove(), 300);
+                                    this.currentNotification = null;
+                                }
+                                
+                                let exportType = 'Export';
+                                if (this.lastCommand.includes('postman')) exportType = 'Postman collection';
+                                else if (this.lastCommand.includes('insomnia')) exportType = 'Insomnia collection';
+                                
+                                this.showNotification(`${exportType} generated successfully!`, 'success', 4000);
+                            }
+                            
+                            this.lastCommand = null;
                         }
                         break;
                 }
@@ -144,12 +215,64 @@ class TerminalManager {
 
     runCommand(command) {
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            // Extract command name for display
+            let commandDisplay = command;
+            if (command.includes('spectrum:')) {
+                const spectrumCmd = command.match(/spectrum:\S+/);
+                commandDisplay = spectrumCmd ? spectrumCmd[0] : command;
+            }
+            
+            // Show running notification
+            this.showNotification(`Running ${commandDisplay}...`, 'running');
+            
             // Clear line and run command
             this.socket.send(JSON.stringify({
                 type: 'input',
                 data: '\x15' + command + '\r'
             }));
+            
+            // Track command for result detection
+            this.lastCommand = command;
+            this.commandStartTime = Date.now();
         }
+    }
+
+    showNotification(message, type = 'info', duration = 3000) {
+        const notification = document.createElement('div');
+        notification.className = `terminal-notification terminal-notification-${type}`;
+        
+        let iconClass = 'info-circle';
+        if (type === 'success') iconClass = 'check-circle';
+        else if (type === 'error') iconClass = 'x-circle';
+        else if (type === 'running') iconClass = 'hourglass-split';
+        
+        notification.innerHTML = `
+            <i class="bi bi-${iconClass}${type === 'running' ? ' spin' : ''}"></i>
+            <span>${message}</span>
+            ${type === 'running' ? '<div class="progress-bar"><div class="progress-bar-fill"></div></div>' : ''}
+        `;
+        
+        // Add to terminal container
+        const terminalContainer = document.querySelector('.terminal-container');
+        terminalContainer.appendChild(notification);
+        
+        // Store reference for running notifications
+        if (type === 'running') {
+            this.currentNotification = notification;
+        }
+        
+        // Animate in
+        setTimeout(() => notification.classList.add('show'), 10);
+        
+        // Remove after duration (except for running notifications)
+        if (type !== 'running') {
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, duration);
+        }
+        
+        return notification;
     }
 
     clear() {

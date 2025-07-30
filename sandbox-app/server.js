@@ -135,6 +135,128 @@ paths:
     res.json(content);
 });
 
+// Get file content
+app.get('/api/sessions/:sessionId/files/:filePath(*)', (req, res) => {
+    // Mock file content based on file path
+    const filePath = req.params.filePath;
+    
+    const mockFiles = {
+        'app/Http/Controllers/Api/UserController.php': `<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\UserRequest;
+use App\Http\Resources\UserResource;
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class UserController extends Controller
+{
+    public function index(Request $request)
+    {
+        $users = User::paginate($request->per_page ?? 15);
+        return UserResource::collection($users);
+    }
+
+    public function store(UserRequest $request)
+    {
+        $user = User::create($request->validated());
+        return new UserResource($user);
+    }
+
+    public function show(User $user)
+    {
+        return new UserResource($user);
+    }
+
+    public function update(UserRequest $request, User $user)
+    {
+        $user->update($request->validated());
+        return new UserResource($user);
+    }
+
+    public function destroy(User $user)
+    {
+        $user->delete();
+        return response()->noContent();
+    }
+}`,
+        'routes/api.php': `<?php
+
+use App\Http\Controllers\Api\UserController;
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('v1')->group(function () {
+    Route::apiResource('users', UserController::class);
+});`,
+        'app/Http/Requests/UserRequest.php': `<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class UserRequest extends FormRequest
+{
+    public function authorize()
+    {
+        return true;
+    }
+
+    public function rules()
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $this->user?->id,
+            'password' => $this->isMethod('POST') ? 'required|string|min:8' : 'nullable|string|min:8',
+        ];
+    }
+}`,
+        'app/Http/Resources/UserResource.php': `<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class UserResource extends JsonResource
+{
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'created_at' => $this->created_at->toISOString(),
+            'updated_at' => $this->updated_at->toISOString(),
+        ];
+    }
+}`
+    };
+    
+    const content = mockFiles[filePath];
+    if (content) {
+        res.type('text/plain').send(content);
+    } else {
+        res.status(404).json({ error: 'File not found' });
+    }
+});
+
+// Save file content
+app.put('/api/sessions/:sessionId/files/:filePath(*)', (req, res) => {
+    const filePath = req.params.filePath;
+    const { content } = req.body;
+    
+    // In a real implementation, this would save to the container's filesystem
+    console.log(`Saving file ${filePath} with content:`, content.substring(0, 100) + '...');
+    
+    // Mock successful save
+    res.json({ 
+        success: true, 
+        message: `File ${filePath} saved successfully`,
+        path: filePath
+    });
+});
+
 app.post('/api/sessions/:sessionId/download', (req, res) => {
     // Mock download functionality
     res.json({ downloadUrl: `/downloads/${uuidv4()}.zip` });

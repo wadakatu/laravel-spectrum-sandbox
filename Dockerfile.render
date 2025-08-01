@@ -1,0 +1,86 @@
+# Multi-stage build for optimization
+FROM node:18-alpine AS node-builder
+
+WORKDIR /app
+COPY sandbox-app/package*.json ./
+RUN npm ci --only=production
+
+# PHP and Laravel setup
+FROM php:8.2-cli-alpine AS php-builder
+
+# Install dependencies
+RUN apk add --no-cache \
+    git curl libpng-dev oniguruma-dev libxml2-lib zip unzip \
+    nodejs npm python3 make g++ \
+    nginx supervisor
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Install Node dependencies for terminal
+WORKDIR /usr/local/bin
+RUN npm init -y && npm install node-pty ws
+
+# Create Laravel project (defaulting to Laravel 11)
+WORKDIR /app/laravel
+RUN composer create-project laravel/laravel:^11.0 . --no-interaction --no-dev
+
+# Install Laravel Spectrum
+ARG SPECTRUM_VERSION="*"
+RUN composer require wadakatu/laravel-spectrum:${SPECTRUM_VERSION} --dev --no-interaction || \
+    composer require wadakatu/laravel-spectrum --dev --no-interaction || \
+    echo "Laravel Spectrum not available"
+
+# Final stage
+FROM php:8.2-cli-alpine
+
+# Install runtime dependencies only
+RUN apk add --no-cache \
+    libpng oniguruma libxml2 \
+    nodejs npm \
+    nginx supervisor \
+    bash
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
+# Copy Node app and dependencies
+COPY --from=node-builder /app/node_modules /app/node_modules
+COPY sandbox-app /app
+
+# Copy Laravel installation
+COPY --from=php-builder /app/laravel /app/laravel
+
+# Copy terminal server dependencies
+COPY --from=php-builder /usr/local/bin/node_modules /usr/local/bin/node_modules
+
+# Copy configuration files
+COPY nginx/nginx-render.conf /etc/nginx/nginx.conf
+COPY environments/laravel-11/terminal-server.js /usr/local/bin/terminal-server
+COPY entrypoint-render.sh /entrypoint.sh
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Create demo API routes
+COPY environments/laravel-11/routes/api.php /app/demo-api.php
+
+# Set permissions
+RUN chmod +x /entrypoint.sh /usr/local/bin/terminal-server && \
+    chown -R www-data:www-data /app/laravel/storage /app/laravel/bootstrap/cache
+
+# Create directories
+RUN mkdir -p /var/log/supervisor /run/nginx
+
+WORKDIR /app
+
+# Expose port (Render uses PORT env variable)
+EXPOSE 10000
+
+# Health check endpoint
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
+  CMD curl -f http://localhost:${PORT:-10000}/health || exit 1
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

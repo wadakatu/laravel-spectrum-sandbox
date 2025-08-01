@@ -40,6 +40,86 @@ make up
 5. View output files in the output viewer
 6. Download generated files using the download button
 
+## Deploy to Render.com (Free Tier)
+
+### Prerequisites
+
+1. A [Render.com](https://render.com) account
+2. This repository pushed to GitHub, GitLab, or Bitbucket
+
+### Deployment Steps
+
+1. **Fork or clone this repository** to your GitHub account
+
+2. **Log in to Render.com** and click "New +" → "Web Service"
+
+3. **Connect your repository**:
+   - Select your Git provider
+   - Choose the laravel-spectrum-sandbox repository
+   - Grant permissions if needed
+
+4. **Configure the service**:
+   - **Name**: `laravel-spectrum-sandbox` (or your preferred name)
+   - **Region**: Choose the closest to you
+   - **Branch**: `main` (or your default branch)
+   - **Root Directory**: Leave empty
+   - **Runtime**: Docker
+   - **Instance Type**: Free
+
+5. **Environment Variables** (optional):
+   - Add any custom environment variables if needed
+   - The defaults in `.env.render` should work fine
+
+6. **Deploy**:
+   - Click "Create Web Service"
+   - Wait for the build and deployment (10-15 minutes first time)
+   - Your sandbox will be available at `https://your-service-name.onrender.com`
+
+### Important Notes for Render Free Tier
+
+- **Cold Starts**: Services sleep after 15 minutes of inactivity
+- **Wake Time**: Takes 1-2 minutes to wake up from sleep
+- **Limitations**: 
+  - 512MB RAM
+  - Shared CPU
+  - Services spin down when inactive
+- **Persistent Storage**: Not available on free tier (files reset on restart)
+
+### Optimizations for Render
+
+This repository includes several optimizations for Render's free tier:
+
+1. **Consolidated Dockerfile** (`Dockerfile.render`):
+   - Multi-stage build to reduce image size
+   - Combined services using supervisord
+   - Optimized for memory usage
+
+2. **Loading States**:
+   - Automatic detection of Render deployment
+   - Loading overlay during cold starts
+   - Health check endpoint for service status
+
+3. **WebSocket Handling**:
+   - Automatic URL detection for Render deployments
+   - Reconnection logic for interrupted connections
+
+### Troubleshooting
+
+1. **Build Failures**:
+   - Check the build logs in Render dashboard
+   - Ensure all required files are committed
+   - Verify Dockerfile.render syntax
+
+2. **Service Won't Start**:
+   - Check runtime logs for errors
+   - Verify port configuration (must use PORT=10000)
+   - Ensure health check endpoint responds
+
+3. **WebSocket Connection Issues**:
+   - Verify the service is fully awake
+   - Check browser console for errors
+   - Ensure HTTPS is being used
+
 ## Available Commands
 
 - `php artisan spectrum:generate` - Generate OpenAPI documentation

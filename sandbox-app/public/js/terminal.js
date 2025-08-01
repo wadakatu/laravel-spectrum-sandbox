@@ -92,7 +92,11 @@ class TerminalManager {
     async connectWebSocket() {
         return new Promise((resolve, reject) => {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsUrl = `${protocol}//${window.location.hostname}:8088/terminal/${this.version}`;
+            // Handle Render.com deployment
+            const isRender = window.location.hostname.includes('onrender.com');
+            const wsUrl = isRender 
+                ? `${protocol}//${window.location.hostname}/terminal/${this.version}`
+                : `${protocol}//${window.location.hostname}:8088/terminal/${this.version}`;
             this.socket = new WebSocket(wsUrl);
 
             this.socket.onopen = () => {
